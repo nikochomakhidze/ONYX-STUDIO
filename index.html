@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ONYX STUDIO">
+<title>ONYX STUDIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0A;
+  --bg2: #111111;
+  --bg3: #1A1A1A;
+  --gold: #C9A84C;
+  --gold2: #E8C97A;
+  --white: #F0EDE8;
+  --muted: #666660;
+  --border: rgba(201,168,76,0.15);
+  --border2: rgba(240,237,232,0.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { background:var(--bg); color:var(--white); font-family:var(--font-body); overflow-x:hidden; }
+
+.screen { display:none; min-height:100vh; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* ── AUTH ── */
+#s-auth {
+  background:var(--bg);
+  align-items:center;
+  justify-content:center;
+  padding:40px 28px;
+  position:relative;
+  overflow:hidden;
+}
+.auth-grain {
+  position:absolute; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.auth-glow {
+  position:absolute; top:-100px; left:50%; transform:translateX(-50%);
+  width:300px; height:300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.auth-logo { font-family:var(--font-display); font-size:52px; letter-spacing:0.08em; color:var(--gold); text-align:center; line-height:1; }
+.auth-tagline { font-size:11px; letter-spacing:0.25em; color:var(--muted); text-align:center; margin-top:4px; text-transform:uppercase; }
+.auth-divider { width:40px; height:1px; background:var(--gold); opacity:0.4; margin:28px auto; }
+.auth-title { font-family:var(--font-display); font-size:28px; letter-spacing:0.05em; text-align:center; margin-bottom:24px; }
+.auth-form { width:100%; max-width:340px; display:flex; flex-direction:column; gap:12px; }
+.auth-input {
+  width:100%; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius-sm); padding:14px 16px;
+  font-family:var(--font-body); font-size:14px; color:var(--white);
+  outline:none; transition:border-color 0.2s;
+}
+.auth-input:focus { border-color:var(--gold); }
+.auth-input::placeholder { color:var(--muted); }
+.btn-gold {
+  background:var(--gold); color:var(--bg); border:none;
+  border-radius:var(--radius-sm); padding:15px;
+  font-family:var(--font-display); font-size:18px; letter-spacing:0.1em;
+  cursor:pointer; transition:background 0.2s, transform 0.1s; width:100%;
+}
+.btn-gold:active { transform:scale(0.97); background:var(--gold2); }
+.btn-gold:disabled { opacity:0.5; cursor:not-allowed; }
+.auth-or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; }
+.auth-or::before,.auth-or::after { content:''; flex:1; height:1px; background:var(--border2); }
+.btn-fb {
+  background:var(--bg2); border:1px solid var(--border2);
+  color:var(--white); border-radius:var(--radius-sm); padding:14px;
+  font-family:var(--font-body); font-size:14px; font-weight:500;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+  transition:border-color 0.2s; text-decoration:none;
+}
+.btn-fb:hover { border-color:rgba(240,237,232,0.2); }
+.auth-switch { font-size:13px; color:var(--muted); text-align:center; margin-top:4px; }
+.auth-switch span { color:var(--gold); cursor:pointer; }
+.auth-guest { font-size:12px; color:var(--muted); text-align:center; margin-top:8px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.auth-error { font-size:13px; color:#EF4444; text-align:center; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius-sm); padding:10px 14px; display:none; }
+.auth-error.show { display:block; }
+
+/* OTP screen */
+.otp-info { font-size:13px; color:var(--muted); text-align:center; line-height:1.6; margin-bottom:4px; }
+.otp-email-display { color:var(--gold); font-family:var(--font-mono); font-size:12px; }
+.otp-inputs { display:flex; gap:10px; justify-content:center; }
+.otp-digit {
+  width:48px; height:56px; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius-sm); text-align:center; font-size:24px; font-family:var(--font-mono);
+  color:var(--white); outline:none; transition:border-color 0.2s;
+}
+.otp-digit:focus { border-color:var(--gold); }
+.otp-resend { font-size:12px; color:var(--muted); text-align:center; cursor:pointer; }
+.otp-resend span { color:var(--gold); text-decoration:underline; cursor:pointer; }
+
+/* ── TOP NAV ── */
+.topnav {
+  background:var(--bg); border-bottom:1px solid var(--border);
+  padding:14px 20px 12px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.topnav-logo { font-family:var(--font-display); font-size:22px; letter-spacing:0.1em; color:var(--gold); }
+.topnav-right { display:flex; align-items:center; gap:10px; }
+.lang-btn {
+  background:transparent; border:1px solid var(--border);
+  color:var(--muted); border-radius:99px; padding:5px 12px;
+  font-family:var(--font-mono); font-size:11px; cursor:pointer;
+  transition:border-color 0.2s, color 0.2s;
+}
+.lang-btn:hover { border-color:var(--gold); color:var(--gold); }
+.user-pill {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:99px; padding:5px 12px;
+  font-size:12px; color:var(--white); cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+}
+.user-dot { width:7px; height:7px; background:var(--gold); border-radius:50%; }
+
+.scroll-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:90px; }
+
+/* ── HOME ── */
+.hero-band {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:24px 20px 20px; position:relative; overflow:hidden;
+}
+.hero-band::before {
+  content:'ONYX';
+  position:absolute; right:-8px; top:50%; transform:translateY(-50%);
+  font-family:var(--font-display); font-size:90px; letter-spacing:0.05em;
+  color:rgba(201,168,76,0.05); pointer-events:none; line-height:1;
+}
+.hero-greet { font-size:12px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; }
+.hero-name { font-family:var(--font-display); font-size:28px; letter-spacing:0.05em; color:var(--white); margin-bottom:18px; }
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.stat-box { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 10px; text-align:center; }
+.stat-val { font-family:var(--font-display); font-size:24px; color:var(--gold); letter-spacing:0.05em; }
+.stat-lbl { font-size:10px; color:var(--muted); margin-top:2px; letter-spacing:0.05em; text-transform:uppercase; }
+
+.sec { padding:20px 20px 0; }
+.sec-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.sec-title { font-family:var(--font-display); font-size:16px; letter-spacing:0.1em; color:var(--white); }
+.sec-link { font-size:11px; color:var(--gold); cursor:pointer; letter-spacing:0.05em; }
+
+.client-card {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius); padding:14px 16px;
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:10px; cursor:pointer;
+  transition:border-color 0.2s, transform 0.15s;
+  text-decoration:none;
+}
+.client-card:active { transform:scale(0.98); }
+.client-card:hover { border-color:var(--border); }
+.c-ico {
+  width:44px; height:44px; border-radius:10px;
+  background:var(--bg3); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.c-info { flex:1; min-width:0; }
+.c-name { font-family:var(--font-display); font-size:16px; letter-spacing:0.05em; color:var(--white); margin-bottom:3px; }
+.c-url { font-family:var(--font-mono); font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-right { text-align:right; flex-shrink:0; }
+.badge { font-size:9px; font-weight:500; padding:3px 9px; border-radius:99px; letter-spacing:0.05em; display:inline-block; }
+.b-live { background:rgba(52,211,153,0.12); color:#34D399; border:1px solid rgba(52,211,153,0.2); }
+.b-build { background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid var(--border); }
+.c-plan { font-size:10px; color:var(--muted); margin-top:4px; }
+
+.quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.quick-card {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius); padding:16px 14px;
+  cursor:pointer; transition:border-color 0.2s, transform 0.15s;
+}
+.quick-card:active { transform:scale(0.97); }
+.quick-card:hover { border-color:var(--border); }
+.q-ico { font-size:22px; margin-bottom:8px; }
+.q-label { font-family:var(--font-display); font-size:14px; letter-spacing:0.05em; color:var(--white); line-height:1.3; }
+.q-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* ── PLANS ── */
+.plans-hero {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:28px 20px 24px; text-align:center;
+}
+.plans-hero-title { font-family:var(--font-display); font-size:36px; letter-spacing:0.1em; color:var(--gold); }
+.plans-hero-sub { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.6; }
+
+.plan-card {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius); padding:22px 20px;
+  margin:0 20px 14px; position:relative;
+  transition:border-color 0.2s;
+}
+.plan-card.featured { border-color:var(--gold); }
+.pop-tag {
+  position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+  background:var(--gold); color:var(--bg);
+  font-family:var(--font-display); font-size:11px; letter-spacing:0.15em;
+  padding:3px 16px; border-radius:99px; white-space:nowrap;
+}
+.plan-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+.plan-name { font-family:var(--font-display); font-size:24px; letter-spacing:0.08em; color:var(--white); }
+.plan-price { font-family:var(--font-display); font-size:32px; color:var(--gold); letter-spacing:0.05em; }
+.plan-mo { font-size:11px; color:var(--muted); text-align:right; margin-top:2px; }
+.plan-feats { list-style:none; display:flex; flex-direction:column; gap:9px; }
+.plan-feats li { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+.plan-feats li::before { content:'◆'; color:var(--gold); font-size:8px; flex-shrink:0; }
+.plan-feats li.on { color:var(--white); }
+.plan-btn {
+  width:100%; padding:14px; border-radius:var(--radius-sm); border:none;
+  font-family:var(--font-display); font-size:18px; letter-spacing:0.1em;
+  cursor:pointer; margin-top:18px; transition:transform 0.15s;
+}
+.plan-btn:active { transform:scale(0.97); }
+.pb-fill { background:var(--gold); color:var(--bg); }
+.pb-out { background:transparent; color:var(--gold); border:1px solid var(--gold) !important; }
+
+/* ── AI CHAT ── */
+.chat-msgs {
+  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:16px; display:flex; flex-direction:column; gap:14px;
+  padding-bottom:100px;
+}
+.msg-row { display:flex; gap:8px; align-items:flex-end; }
+.msg-row.me { flex-direction:row-reverse; }
+.av {
+  width:30px; height:30px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:600;
+}
+.av-ai { background:var(--gold); color:var(--bg); font-family:var(--font-display); font-size:13px; letter-spacing:0.05em; }
+.av-user { background:var(--bg3); border:1px solid var(--border); color:var(--white); font-family:var(--font-display); font-size:12px; }
+.bubble {
+  max-width:260px; padding:11px 14px; font-size:13px; line-height:1.55;
+  border-radius:16px;
+}
+.bubble.bot { background:var(--bg2); border:1px solid var(--border2); color:var(--white); border-radius:16px 16px 16px 4px; }
+.bubble.user { background:var(--gold); color:var(--bg); border-radius:16px 16px 4px 16px; font-weight:500; }
+.typing { display:flex; gap:5px; align-items:center; padding:12px 16px; }
+.typing span { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:bounce 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay:.2s; }
+.typing span:nth-child(3) { animation-delay:.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)} }
+
+.chat-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--bg); border-top:1px solid var(--border);
+  padding:10px 14px 14px;
+  padding-bottom:max(14px, env(safe-area-inset-bottom));
+  display:flex; gap:10px; align-items:center; z-index:200;
+}
+.chat-inp {
+  flex:1; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:99px; padding:11px 18px;
+  font-family:var(--font-body); font-size:14px; color:var(--white);
+  outline:none; transition:border-color 0.2s;
+}
+.chat-inp:focus { border-color:var(--gold); }
+.chat-inp::placeholder { color:var(--muted); }
+.send-btn {
+  width:42px; height:42px; background:var(--gold); border:none;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:16px; cursor:pointer; flex-shrink:0; transition:transform 0.15s;
+  color:var(--bg);
+}
+.send-btn:active { transform:scale(0.9); }
+
+/* ── PROFILE ── */
+.profile-header {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:28px 20px; text-align:center;
+}
+.profile-av {
+  width:72px; height:72px; border-radius:50%;
+  background:var(--bg3); border:2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:30px; color:var(--gold);
+  margin:0 auto 12px; overflow:hidden;
+}
+.profile-av img { width:100%; height:100%; object-fit:cover; }
+.profile-name { font-family:var(--font-display); font-size:24px; letter-spacing:0.05em; }
+.profile-email { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-top:4px; }
+.profile-plan { display:inline-block; background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid var(--border); font-size:11px; padding:4px 14px; border-radius:99px; margin-top:10px; letter-spacing:0.1em; }
+
+.menu-list { padding:16px 20px; display:flex; flex-direction:column; gap:8px; }
+.menu-item {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius); padding:16px 18px;
+  display:flex; align-items:center; gap:12px; cursor:pointer;
+  transition:border-color 0.2s;
+}
+.menu-item:hover { border-color:var(--border); }
+.menu-ico { font-size:20px; }
+.menu-label { font-family:var(--font-display); font-size:16px; letter-spacing:0.05em; flex:1; }
+.menu-arr { color:var(--muted); font-size:18px; }
+.menu-item.danger .menu-label { color:#EF4444; }
+
+/* ── BOTTOM NAV ── */
+.bnav {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--bg); border-top:1px solid var(--border);
+  display:flex; padding-bottom:env(safe-area-inset-bottom); z-index:150;
+}
+.bi {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:10px 0 8px; cursor:pointer; color:var(--muted); border:none;
+  background:none; font-family:var(--font-body); transition:color 0.15s;
+  position:relative;
+}
+.bi.active { color:var(--gold); }
+.bi-ico { font-size:20px; line-height:1; }
+.bi-lbl { font-size:9px; letter-spacing:0.1em; text-transform:uppercase; }
+.bi-dot {
+  position:absolute; top:8px; right:calc(50% - 12px);
+  width:6px; height:6px; background:#EF4444; border-radius:50%;
+}
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp 0.35s ease both; }
+.fade-up:nth-child(2){animation-delay:.05s}
+.fade-up:nth-child(3){animation-delay:.1s}
+.fade-up:nth-child(4){animation-delay:.15s}
+
+.spinner {
+  width:20px; height:20px; border:2px solid rgba(10,10,10,0.3); border-top-color:var(--bg);
+  border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="s-auth" class="screen active">
+  <div class="auth-grain"></div>
+  <div class="auth-glow"></div>
+
+  <div style="text-align:center; margin-bottom:auto; padding-top:20px;">
+    <div class="auth-logo">ONYX</div>
+    <div class="auth-logo" style="font-size:28px; letter-spacing:0.3em; color:var(--white); margin-top:-8px;">STUDIO</div>
+    <div class="auth-tagline">AI-powered websites · Georgia</div>
+  </div>
+
+  <div class="auth-divider"></div>
+
+  <!-- Step 1: Login -->
+  <div id="step-login" style="width:100%; max-width:340px; display:flex; flex-direction:column; gap:12px;">
+    <div class="auth-title" id="auth-title-text">შესვლა</div>
+    <div class="auth-error" id="auth-error"></div>
+    <input class="auth-input" id="auth-email" type="email" placeholder="ელ-ფოსტა" autocomplete="email">
+    <input class="auth-input" id="auth-pass" type="password" placeholder="პაროლი" autocomplete="current-password">
+    <button class="btn-gold" id="btn-submit" onclick="doLoginOrRegister()">შესვლა</button>
+    <div class="auth-or">ან</div>
+    <a class="btn-fb" id="btn-fb" href="#" onclick="fbLogin(event)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      Facebook-ით შესვლა
+    </a>
+    <div class="auth-switch">ანგარიში არ გაქვს? <span onclick="switchToRegister()">დარეგისტრირდი</span></div>
+    <div class="auth-guest" onclick="guestLogin()">სტუმრად შესვლა →</div>
+  </div>
+
+  <!-- Step 2: Register -->
+  <div id="step-register" style="width:100%; max-width:340px; display:none; flex-direction:column; gap:12px;">
+    <div class="auth-title">რეგისტრაცია</div>
+    <div class="auth-error" id="reg-error"></div>
+    <input class="auth-input" id="reg-email" type="email" placeholder="ელ-ფოსტა" autocomplete="email">
+    <input class="auth-input" id="reg-pass" type="password" placeholder="პაროლი" autocomplete="new-password">
+    <input class="auth-input" id="reg-pass2" type="password" placeholder="გაიმეორე პაროლი" autocomplete="new-password">
+    <div style="background:var(--bg3); border-radius:var(--radius-sm); padding:10px 14px; font-size:11px; color:var(--muted); display:flex; flex-direction:column; gap:4px;">
+      <span id="rule-len" style="transition:color .2s;">⬜ მინიმუმ 6 სიმბოლო</span>
+      <span id="rule-upper" style="transition:color .2s;">⬜ მინიმუმ 1 დიდი ასო (A-Z)</span>
+      <span id="rule-num" style="transition:color .2s;">⬜ მინიმუმ 1 ციფრი (0-9)</span>
+    </div>
+    <button class="btn-gold" id="btn-reg" onclick="doRegister()">რეგისტრაცია</button>
+    <div class="auth-switch">უკვე გაქვს ანგარიში? <span onclick="switchToLogin()">შესვლა</span></div>
+    <div class="auth-guest" onclick="guestLogin()">სტუმრად შესვლა →</div>
+  </div>
+
+  <div style="margin-top:auto; padding-top:20px;"></div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app" style="display:none; flex-direction:column; min-height:100vh;">
+
+  <div class="topnav">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button id="back-btn" onclick="goBack()" style="display:none; background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; padding:0 6px 0 0; line-height:1;">‹</button>
+      <div class="topnav-logo" onclick="showScreen('home')" style="cursor:pointer;">ONYX</div>
+    </div>
+    <div class="topnav-right">
+      <button class="lang-btn" id="lang-btn" onclick="toggleLang()">ENG</button>
+      <div class="user-pill" onclick="showScreen('profile')">
+        <div class="user-dot"></div>
+        <span id="user-short">მომხ.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="s-home" class="screen active">
+    <div class="scroll-body">
+      <div class="hero-band fade-up">
+        <div class="hero-greet" id="greet-txt">გამარჯობა 👋</div>
+        <div class="hero-name" id="user-name-display">ONYX STUDIO</div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-sites">—</div>
+            <div class="stat-lbl" data-ka="საიტი" data-en="Sites">საიტი</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-visits">—</div>
+            <div class="stat-lbl" data-ka="ვიზიტი" data-en="Visits">ვიზიტი</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-revenue">—</div>
+            <div class="stat-lbl" data-ka="შემოსავ." data-en="Revenue">შემოსავ.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec fade-up" style="margin-top:20px;">
+        <div class="sec-head">
+          <div class="sec-title" data-ka="კლიენტის საიტები" data-en="Client Sites">კლიენტის საიტები</div>
+          <div class="sec-link" data-ka="ყველა →" data-en="All →">ყველა →</div>
+        </div>
+        <div id="clients-list"></div>
+      </div>
+
+      <div class="sec fade-up" style="margin-top:4px; padding-bottom:24px;">
+        <div class="sec-head">
+          <div class="sec-title" data-ka="სწრაფი მოქმედება" data-en="Quick Actions">სწრაფი მოქმედება</div>
+        </div>
+        <div class="quick-grid">
+          <div class="quick-card" onclick="showScreen('plans')">
+            <div class="q-ico">🌐</div>
+            <div class="q-label" data-ka="ახალი საიტი" data-en="New Site">ახალი საიტი</div>
+            <div class="q-sub" data-ka="24 საათში" data-en="In 24 hours">24 საათში</div>
+          </div>
+          <div class="quick-card" onclick="showScreen('chat')">
+            <div class="q-ico">🤖</div>
+            <div class="q-label" data-ka="AI ასისტენტი" data-en="AI Assistant">AI ასისტენტი</div>
+            <div class="q-sub" data-ka="ჰკითხე ნებისმიერი" data-en="Ask anything">ჰკითხე ნებისმიერი</div>
+          </div>
+          <div class="quick-card">
+            <div class="q-ico">📊</div>
+            <div class="q-label" data-ka="ანალიტიკა" data-en="Analytics">ანალიტიკა</div>
+            <div class="q-sub" data-ka="ვიზიტები, კლიკები" data-en="Visits & clicks">ვიზიტები, კლიკები</div>
+          </div>
+          <div class="quick-card">
+            <div class="q-ico">💬</div>
+            <div class="q-label" data-ka="მხარდაჭერა" data-en="Support">მხარდაჭერა</div>
+            <div class="q-sub" data-ka="24/7 ჩვენთან" data-en="24/7 with us">24/7 ჩვენთან</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANS -->
+  <div id="s-plans" class="screen">
+    <div class="scroll-body">
+      <div class="plans-hero fade-up">
+        <div class="plans-hero-title" data-ka="პაკეტები" data-en="Plans">პაკეტები</div>
+        <div class="plans-hero-sub" data-ka="ყველა პაკეტში: Hosting · SSL · მობილური · მხარდაჭერა" data-en="All plans: Hosting · SSL · Mobile · Support">ყველა პაკეტში: Hosting · SSL · მობილური · მხარდაჭერა</div>
+      </div>
+      <div style="height:20px;"></div>
+
+      <div class="plan-card fade-up">
+        <div class="plan-top">
+          <div class="plan-name" data-ka="სტარტი" data-en="STARTER">სტარტი</div>
+          <div><div class="plan-price">100₾</div><div class="plan-mo" data-ka="/თვე" data-en="/mo">/თვე</div></div>
+        </div>
+        <ul class="plan-feats">
+          <li class="on" data-ka="1 გვერდიანი საიტი" data-en="1-page website">1 გვერდიანი საიტი</li>
+          <li class="on" data-ka="SSL სერტიფიკატი" data-en="SSL Certificate">SSL სერტიფიკატი</li>
+          <li class="on" data-ka="Hosting (1 წელი)" data-en="Hosting (1 year)">Hosting (1 წელი)</li>
+          <li class="on" data-ka="მობილური ვერსია" data-en="Mobile version">მობილური ვერსია</li>
+          <li data-ka="SEO ოპტიმიზაცია" data-en="SEO Optimization">SEO ოპტიმიზაცია</li>
+          <li data-ka="AI Chat Bot" data-en="AI Chat Bot">AI Chat Bot</li>
+        </ul>
+        <button class="plan-btn pb-out" onclick="orderPlan('სტარტი', 100)">სტარტის არჩევა</button>
+      </div>
+
+      <div class="plan-card featured fade-up">
+        <div class="pop-tag" data-ka="★ პოპულარული" data-en="★ POPULAR">★ პოპულარული</div>
+        <div class="plan-top">
+          <div class="plan-name" data-ka="ბიზნეს" data-en="BUSINESS">ბიზნეს</div>
+          <div><div class="plan-price">250₾</div><div class="plan-mo" data-ka="/თვე" data-en="/mo">/თვე</div></div>
+        </div>
+        <ul class="plan-feats">
+          <li class="on" data-ka="5 გვერდიანი საიტი" data-en="5-page website">5 გვერდიანი საიტი</li>
+          <li class="on" data-ka="SSL · Hosting · მობილური" data-en="SSL · Hosting · Mobile">SSL · Hosting · მობილური</li>
+          <li class="on" data-ka="SEO ოპტიმიზაცია" data-en="SEO Optimization">SEO ოპტიმიზაცია</li>
+          <li class="on" data-ka="AI Chat Bot" data-en="AI Chat Bot">AI Chat Bot</li>
+          <li class="on" data-ka="კონტაქტის ფორმა" data-en="Contact Form">კონტაქტის ფორმა</li>
+          <li class="on" data-ka="ყოველთვიური განახლება" data-en="Monthly updates">ყოველთვიური განახლება</li>
+        </ul>
+        <button class="plan-btn pb-fill" onclick="orderPlan('ბიზნეს', 250)">ბიზნეს პაკეტის არჩევა</button>
+      </div>
+
+      <div class="plan-card fade-up">
+        <div class="plan-top">
+          <div class="plan-name" data-ka="პრემიუმ" data-en="PREMIUM">პრემიუმ</div>
+          <div><div class="plan-price">400₾</div><div class="plan-mo" data-ka="/თვე" data-en="/mo">/თვე</div></div>
+        </div>
+        <ul class="plan-feats">
+          <li class="on" data-ka="უსაზღვრო გვერდები" data-en="Unlimited pages">უსაზღვრო გვერდები</li>
+          <li class="on" data-ka="AI კონტენტი ავტომატურად" data-en="AI content auto-generated">AI კონტენტი ავტომატურად</li>
+          <li class="on" data-ka="ონლაინ მაღაზია" data-en="Online store">ონლაინ მაღაზია</li>
+          <li class="on" data-ka="პრიორიტეტული მხარდაჭერა" data-en="Priority support">პრიორიტეტული მხარდაჭერა</li>
+          <li class="on" data-ka="ყოველკვირეული ანგარიში" data-en="Weekly reports">ყოველკვირეული ანგარიში</li>
+          <li class="on" data-ka="Custom Domain" data-en="Custom Domain">Custom Domain</li>
+        </ul>
+        <button class="plan-btn pb-out" onclick="orderPlan('პრემიუმ', 400)">პრემიუმ პაკეტის არჩევა</button>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+
+  <!-- AI CHAT -->
+  <div id="s-chat" class="screen" style="position:relative;">
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg-row fade-up">
+        <div class="av av-ai">AI</div>
+        <div class="bubble bot" id="chat-welcome">გამარჯობა! მე ONYX STUDIO-ს AI ასისტენტი ვარ. 👋<br><br>შეგიძლია მკითხო ფასებზე, საიტის შეკვეთაზე, ან ნებისმიერ სხვა თემაზე.</div>
+      </div>
+      <div class="msg-row fade-up">
+        <div class="av av-ai">AI</div>
+        <div class="bubble bot">
+          <strong>სწრაფი კითხვები:</strong><br>
+          <span style="color:var(--gold); cursor:pointer;" onclick="quickQ('ფასები რამდენია?')">◆ ფასები</span><br>
+          <span style="color:var(--gold); cursor:pointer;" onclick="quickQ('როგორ შევუკვეთო საიტი?')">◆ საიტის შეკვეთა</span><br>
+          <span style="color:var(--gold); cursor:pointer;" onclick="quickQ('კლიენტების საიტები ვნახო')">◆ კლიენტების საიტები</span>
+        </div>
+      </div>
+    </div>
+    <div class="chat-bar">
+      <input class="chat-inp" id="chat-inp" placeholder="შეკითხვა..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="send-btn" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="s-profile" class="screen">
+    <div class="scroll-body">
+      <div class="profile-header fade-up">
+        <div class="profile-av" id="profile-av">ო</div>
+        <div class="profile-name" id="profile-name">სტუმარი</div>
+        <div class="profile-email" id="profile-email">guest@onyxstudio.ge</div>
+        <div class="profile-plan" id="profile-plan">სტუმარი</div>
+      </div>
+      <div class="menu-list fade-up">
+        <div class="menu-item">
+          <div class="menu-ico">📋</div>
+          <div class="menu-label" data-ka="ჩემი შეკვეთები" data-en="My Orders">ჩემი შეკვეთები</div>
+          <div class="menu-arr">›</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-ico">💳</div>
+          <div class="menu-label" data-ka="გადახდები" data-en="Payments">გადახდები</div>
+          <div class="menu-arr">›</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-ico">🔔</div>
+          <div class="menu-label" data-ka="შეტყობინებები" data-en="Notifications">შეტყობინებები</div>
+          <div class="menu-arr">›</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-ico">⚙️</div>
+          <div class="menu-label" data-ka="პარამეტრები" data-en="Settings">პარამეტრები</div>
+          <div class="menu-arr">›</div>
+        </div>
+        <div class="menu-item" id="menu-admin" style="display:none;" onclick="showScreen('admin')">
+          <div class="menu-ico">🛡️</div>
+          <div class="menu-label" style="color:var(--gold);">ადმინ პანელი</div>
+          <div class="menu-arr">›</div>
+        </div>
+        <div class="menu-item danger" onclick="doLogout()">
+          <div class="menu-ico">🚪</div>
+          <div class="menu-label" style="color:#EF4444;" data-ka="გასვლა" data-en="Sign Out">გასვლა</div>
+          <div class="menu-arr">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="s-admin" class="screen">
+    <div class="scroll-body">
+
+      <!-- Header -->
+      <div style="background:var(--bg2); border-bottom:1px solid var(--border); padding:20px 20px 16px;">
+        <div style="font-family:var(--font-display); font-size:30px; letter-spacing:0.1em; color:var(--gold);">🛡️ ADMIN PANEL</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px; font-family:var(--font-mono);">ONYX STUDIO · მართვის პანელი</div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:16px 20px 0;">
+        <div class="stat-box"><div class="stat-val" id="adm-users">—</div><div class="stat-lbl">იუზერი</div></div>
+        <div class="stat-box"><div class="stat-val" id="adm-sites">—</div><div class="stat-lbl">საიტი</div></div>
+        <div class="stat-box"><div class="stat-val" id="adm-rev">—</div><div class="stat-lbl">შემოსავ.</div></div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex; gap:0; padding:16px 20px 0;">
+        <button onclick="adminTab('users')" id="atab-users" style="flex:1; padding:10px; background:var(--gold); color:var(--bg); border:none; border-radius:var(--radius-sm) 0 0 var(--radius-sm); font-family:var(--font-display); font-size:13px; letter-spacing:0.05em; cursor:pointer;">მომხმარებლები</button>
+        <button onclick="adminTab('db')" id="atab-db" style="flex:1; padding:10px; background:var(--bg3); color:var(--muted); border:1px solid var(--border2); border-left:none; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-family:var(--font-display); font-size:13px; letter-spacing:0.05em; cursor:pointer;">მონაცემთა ბაზა</button>
+      </div>
+
+      <!-- Users Tab -->
+      <div id="admin-tab-users" style="padding:12px 20px 20px;">
+        <!-- Search -->
+        <input id="admin-search" type="text" placeholder="🔍  ძიება ელ-ფოსტით..." oninput="adminSearch()"
+          style="width:100%; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:11px 14px; font-family:var(--font-body); font-size:13px; color:var(--white); outline:none; margin-bottom:12px;">
+        <div id="admin-users-list"></div>
+      </div>
+
+      <!-- DB Tab -->
+      <div id="admin-tab-db" style="display:none; padding:12px 20px 20px;">
+        <div style="font-size:12px; color:var(--muted); margin-bottom:12px; font-family:var(--font-mono);">users ცხრილი · SQLite</div>
+        <div style="overflow-x:auto; border-radius:var(--radius-sm); border:1px solid var(--border2);">
+          <table id="admin-db-table" style="width:100%; border-collapse:collapse; font-size:11px; font-family:var(--font-mono);">
+            <thead>
+              <tr style="background:var(--bg3); border-bottom:1px solid var(--border);">
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">ID</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">ელ-ფოსტა</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">სახელი</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">პაკეტი</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">როლი</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--gold); white-space:nowrap;">რეგ. თარიღი</th>
+              </tr>
+            </thead>
+            <tbody id="admin-db-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="bnav" id="bnav">
+    <button class="bi active" id="bi-home" onclick="showScreen('home')">
+      <div class="bi-ico">🏠</div>
+      <div class="bi-lbl" data-ka="მთავარი" data-en="Home">მთავარი</div>
+    </button>
+    <button class="bi" id="bi-plans" onclick="showScreen('plans')">
+      <div class="bi-ico">🌐</div>
+      <div class="bi-lbl" data-ka="პაკეტები" data-en="Plans">პაკეტები</div>
+    </button>
+    <button class="bi" id="bi-chat" onclick="showScreen('chat')">
+      <div style="position:relative; display:inline-block;">
+        <div class="bi-ico">🤖</div>
+        <div class="bi-dot"></div>
+      </div>
+      <div class="bi-lbl">AI</div>
+    </button>
+    <button class="bi" id="bi-profile" onclick="showScreen('profile')">
+      <div class="bi-ico">👤</div>
+      <div class="bi-lbl" data-ka="პროფილი" data-en="Profile">პროფილი</div>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ─── CONFIG ───
+// ⚠️ შეცვალე ეს URL Railway-ზე deploy-ის შემდეგ
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : 'https://onyx-backend.up.railway.app';
+
+// ─── STATE ───
+let lang = 'ka';
+let currentUser = null;
+let token = null;
+let pendingEmail = '';
+
+const store = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del: k => { try { localStorage.removeItem(k); } catch {} }
+};
+
+// ─── BOOT ───
+window.addEventListener('DOMContentLoaded', () => {
+  // Handle Facebook OAuth redirect token from URL hash
+  const hash = window.location.hash;
+  if (hash.includes('token=')) {
+    const t = hash.split('token=')[1];
+    if (t) {
+      store.set('onyx_token', t);
+      window.location.hash = '';
+      token = t;
+      fetchMeAndLaunch();
+      return;
+    }
+  }
+  if (hash.includes('auth-error=')) {
+    showError('auth-error', 'Facebook-ით შესვლა ვერ მოხერხდა');
+    window.location.hash = '';
+  }
+
+  const savedToken = store.get('onyx_token');
+  if (savedToken) {
+    token = savedToken;
+    fetchMeAndLaunch();
+  }
+  applyLang();
+});
+
+async function fetchMeAndLaunch() {
+  try {
+    const res = await api('/auth/me');
+    currentUser = res;
+    launchApp();
+  } catch {
+    store.del('onyx_token');
+    token = null;
+  }
+}
+
+// ─── API HELPER ───
+async function api(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(API + path, { ...options, headers: { ...headers, ...options.headers } });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Server error');
+  return data;
+}
+
+// ─── AUTH: SHOW/HIDE STEPS ───
+function switchToRegister() {
+  document.getElementById('step-login').style.display = 'none';
+  document.getElementById('step-register').style.display = 'flex';
+}
+
+function switchToLogin() {
+  document.getElementById('step-login').style.display = 'flex';
+  document.getElementById('step-register').style.display = 'none';
+}
+
+// Live password validation indicators
+document.addEventListener('DOMContentLoaded', () => {
+  const p = document.getElementById('reg-pass');
+  if (p) p.addEventListener('input', () => {
+    const v = p.value;
+    const ok = c => c ? 'color:var(--gold)' : 'color:var(--muted)';
+    const sym = c => c ? '✅' : '⬜';
+    document.getElementById('rule-len').setAttribute('style', ok(v.length >= 6));
+    document.getElementById('rule-len').textContent = sym(v.length >= 6) + ' მინიმუმ 6 სიმბოლო';
+    document.getElementById('rule-upper').setAttribute('style', ok(/[A-Z]/.test(v)));
+    document.getElementById('rule-upper').textContent = sym(/[A-Z]/.test(v)) + ' მინიმუმ 1 დიდი ასო (A-Z)';
+    document.getElementById('rule-num').setAttribute('style', ok(/[0-9]/.test(v)));
+    document.getElementById('rule-num').textContent = sym(/[0-9]/.test(v)) + ' მინიმუმ 1 ციფრი (0-9)';
+  });
+});
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+
+function clearError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span>' : btn.dataset.label || btn.textContent;
+}
+
+// ─── LOGIN ───
+async function doLoginOrRegister() {
+  clearError('auth-error');
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value.trim();
+  if (!email || !pass) { showError('auth-error', 'შეავსე ყველა ველი'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.dataset.label = btn.textContent;
+  setLoading('btn-submit', true);
+
+  try {
+    const data = await api('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pass })
+    });
+    token = data.token;
+    currentUser = data.user;
+    store.set('onyx_token', token);
+    launchApp();
+  } catch(e) {
+    showError('auth-error', e.message);
+  } finally {
+    setLoading('btn-submit', false);
+  }
+}
+
+// ─── REGISTER ───
+async function doRegister() {
+  clearError('reg-error');
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  if (!email || !pass || !pass2) { showError('reg-error', 'შეავსე ყველა ველი'); return; }
+  if (pass !== pass2) { showError('reg-error', 'პაროლები არ ემთხვევა'); return; }
+  if (pass.length < 6) { showError('reg-error', 'პაროლი მინიმუმ 6 სიმბოლო'); return; }
+  if (!/[A-Z]/.test(pass)) { showError('reg-error', 'პაროლი უნდა შეიცავდეს დიდ ასოს'); return; }
+  if (!/[0-9]/.test(pass)) { showError('reg-error', 'პაროლი უნდა შეიცავდეს ციფრს'); return; }
+
+  const btn = document.getElementById('btn-reg');
+  btn.dataset.label = btn.textContent;
+  setLoading('btn-reg', true);
+  try {
+    const data = await api('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pass, confirm_password: pass2 })
+    });
+    token = data.token;
+    currentUser = data.user;
+    store.set('onyx_token', token);
+    launchApp();
+  } catch(e) {
+    showError('reg-error', e.message);
+  } finally {
+    setLoading('btn-reg', false);
+  }
+}
+
+// ─── FACEBOOK LOGIN ───
+function fbLogin(e) {
+  e.preventDefault();
+  window.location.href = API + '/auth/facebook';
+}
+
+// ─── GUEST LOGIN ───
+function guestLogin() {
+  currentUser = { email: 'guest@onyxstudio.ge', name: lang === 'ka' ? 'სტუმარი' : 'Guest', plan: lang === 'ka' ? 'სტუმარი' : 'Guest', guest: true };
+  launchApp(true);
+}
+
+// ─── LOGOUT ───
+function doLogout() {
+  store.del('onyx_token');
+  token = null;
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('s-auth').classList.add('active');
+  document.getElementById('s-auth').style.display = 'flex';
+  switchToLogin();
+}
+
+// ─── LAUNCH APP ───
+async function launchApp(guest = false) {
+  document.getElementById('s-auth').classList.remove('active');
+  document.getElementById('s-auth').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  const n = currentUser.name || currentUser.email?.split('@')[0] || 'მომხმარებელი';
+  document.getElementById('user-name-display').textContent = n.toUpperCase();
+  document.getElementById('user-short').textContent = n.slice(0,2).toUpperCase();
+  document.getElementById('profile-name').textContent = n;
+  document.getElementById('profile-email').textContent = currentUser.email || '';
+  document.getElementById('profile-plan').textContent = currentUser.plan || (lang === 'ka' ? 'სტუმარი' : 'Guest');
+
+  // Avatar
+  const avEl = document.getElementById('profile-av');
+  if (currentUser.avatar) {
+    avEl.innerHTML = `<img src="${currentUser.avatar}" alt="">`;
+  } else {
+    avEl.textContent = n.slice(0,1).toUpperCase();
+  }
+
+  // Show admin button if admin
+  const adminMenuItem = document.getElementById('menu-admin');
+  if (adminMenuItem) adminMenuItem.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+
+  showScreen('home');
+
+  if (!guest) {
+    loadStats();
+    loadClients();
+  } else {
+    // Guest: show hardcoded
+    document.getElementById('stat-sites').textContent = '3';
+    document.getElementById('stat-visits').textContent = '2.1K';
+    document.getElementById('stat-revenue').textContent = '750₾';
+    renderClients([
+      { icon:'🍽️', name_ka:'რესტორანი სვანეთი', name_en:'Restaurant Svaneti', url:'https://www.restoranisvaneti.com.ge', status:'live', plan_ka:'ბიზნეს', plan_en:'Business' },
+      { icon:'⚡', name_ka:'ელვაპლუსი', name_en:'Elvaplus', url:'https://elvaplus-express-teal.vercel.app', status:'live', plan_ka:'პრემიუმ', plan_en:'Premium' },
+      { icon:'🏠', name_ka:'ჩემი სახლი', name_en:'Chemi Sakhli', url:'https://chemi.up.railway.app', status:'live', plan_ka:'სტარტი', plan_en:'Starter' },
+    ]);
+  }
+}
+
+// ─── ADMIN ───
+let allAdminUsers = [];
+
+async function loadAdmin() {
+  try {
+    const [stats, users] = await Promise.all([api('/admin/stats'), api('/admin/users')]);
+    allAdminUsers = users;
+
+    document.getElementById('adm-users').textContent = stats.total_users;
+    document.getElementById('adm-sites').textContent = stats.total_sites;
+    document.getElementById('adm-rev').textContent = stats.total_revenue + '₾';
+
+    renderAdminUsers(users);
+    renderAdminDB(users);
+  } catch(e) { console.error(e); }
+}
+
+function adminTab(tab) {
+  const isUsers = tab === 'users';
+  document.getElementById('admin-tab-users').style.display = isUsers ? 'block' : 'none';
+  document.getElementById('admin-tab-db').style.display = isUsers ? 'none' : 'block';
+  document.getElementById('atab-users').style.cssText = isUsers
+    ? 'flex:1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;cursor:pointer;'
+    : 'flex:1;padding:10px;background:var(--bg3);color:var(--muted);border:1px solid var(--border2);border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;cursor:pointer;';
+  document.getElementById('atab-db').style.cssText = !isUsers
+    ? 'flex:1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;cursor:pointer;'
+    : 'flex:1;padding:10px;background:var(--bg3);color:var(--muted);border:1px solid var(--border2);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-family:var(--font-display);font-size:13px;letter-spacing:0.05em;cursor:pointer;';
+}
+
+function adminSearch() {
+  const q = document.getElementById('admin-search').value.toLowerCase();
+  renderAdminUsers(allAdminUsers.filter(u => u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q)));
+}
+
+const PLANS = ['სტუმარი', 'სტარტი', 'ბიზნეს', 'პრემიუმ'];
+const PLAN_COLORS = { 'სტუმარი': '#666', 'სტარტი': '#60A5FA', 'ბიზნეს': '#C9A84C', 'პრემიუმ': '#34D399' };
+
+function renderAdminUsers(users) {
+  document.getElementById('admin-users-list').innerHTML = users.length === 0
+    ? '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px;">მომხმარებელი არ მოიძებნა</div>'
+    : users.map(u => `
+      <div id="urow-${u.id}" style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;color:var(--gold);flex-shrink:0;">
+            ${escHtml(u.name.slice(0,1).toUpperCase())}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;color:var(--white);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(u.email)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono);">
+              #${u.id} · ${u.provider} · ${escHtml(u.created_at?.slice(0,10) || '')}
+            </div>
+          </div>
+          ${u.role === 'admin' ? '<span style="font-size:9px;background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid var(--border);padding:3px 8px;border-radius:99px;flex-shrink:0;">ADMIN</span>' : ''}
+        </div>
+        ${u.role !== 'admin' ? `
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+          <div style="font-size:11px;color:var(--muted);flex-shrink:0;">პაკეტი:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1;">
+            ${PLANS.map(p => `
+              <button onclick="updateUserPlan(${u.id},'${p}',this)" style="padding:4px 10px;border-radius:99px;font-size:10px;font-family:var(--font-mono);cursor:pointer;border:1px solid ${u.plan===p?PLAN_COLORS[p]:'var(--border2)'};background:${u.plan===p?`${PLAN_COLORS[p]}22`:'transparent'};color:${u.plan===p?PLAN_COLORS[p]:'var(--muted)'};">${p}</button>
+            `).join('')}
+          </div>
+          <button onclick="deleteUser(${u.id})" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#EF4444;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;flex-shrink:0;">🗑</button>
+        </div>` : ''}
+      </div>
+    `).join('');
+}
+
+function renderAdminDB(users) {
+  document.getElementById('admin-db-body').innerHTML = users.map((u, i) => `
+    <tr style="border-bottom:1px solid var(--border2);background:${i%2===0?'var(--bg)':'var(--bg2)'};">
+      <td style="padding:9px 12px;color:var(--muted);">${u.id}</td>
+      <td style="padding:9px 12px;color:var(--white);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(u.email)}</td>
+      <td style="padding:9px 12px;color:var(--white);">${escHtml(u.name)}</td>
+      <td style="padding:9px 12px;"><span style="color:${PLAN_COLORS[u.plan]||'#666'}">${u.plan}</span></td>
+      <td style="padding:9px 12px;color:${u.role==='admin'?'var(--gold)':'var(--muted)'};">${u.role}</td>
+      <td style="padding:9px 12px;color:var(--muted);">${u.created_at?.slice(0,10)||''}</td>
+    </tr>
+  `).join('');
+}
+
+async function updateUserPlan(userId, plan, btn) {
+  try {
+    await api(`/admin/users/${userId}/plan`, { method: 'PATCH', body: JSON.stringify({ plan }) });
+    // Refresh that user's row buttons
+    allAdminUsers = allAdminUsers.map(u => u.id === userId ? {...u, plan} : u);
+    renderAdminUsers(allAdminUsers);
+    renderAdminDB(allAdminUsers);
+  } catch(e) { alert(e.message); }
+}
+
+async function deleteUser(userId) {
+  try {
+    await api(`/admin/users/${userId}`, { method: 'DELETE' });
+    allAdminUsers = allAdminUsers.filter(u => u.id !== userId);
+    renderAdminUsers(allAdminUsers);
+    renderAdminDB(allAdminUsers);
+    document.getElementById('adm-users').textContent = allAdminUsers.length;
+  } catch(e) { alert(e.message); }
+}
+
+// ─── LOAD STATS ───
+async function loadStats() {
+  try {
+    const s = await api('/stats');
+    document.getElementById('stat-sites').textContent = s.total_sites;
+    const visits = s.total_visits >= 1000 ? (s.total_visits/1000).toFixed(1)+'K' : s.total_visits;
+    document.getElementById('stat-visits').textContent = visits;
+    document.getElementById('stat-revenue').textContent = s.total_revenue + '₾';
+  } catch {}
+}
+
+// ─── LOAD CLIENTS ───
+async function loadClients() {
+  try {
+    const clients = await api('/clients');
+    renderClients(clients);
+  } catch {}
+}
+
+function renderClients(clients) {
+  const list = document.getElementById('clients-list');
+  list.innerHTML = clients.map(c => `
+    <a class="client-card" href="${c.url}" target="_blank" rel="noopener">
+      <div class="c-ico">${c.icon}</div>
+      <div class="c-info">
+        <div class="c-name">${lang === 'ka' ? c.name_ka : c.name_en}</div>
+        <div class="c-url">${c.url.replace('https://','')}</div>
+      </div>
+      <div class="c-right">
+        <span class="badge b-${c.status === 'live' ? 'live' : 'build'}">${c.status.toUpperCase()}</span>
+        <div class="c-plan">${lang === 'ka' ? c.plan_ka : c.plan_en}</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+// ─── SCREENS ───
+let screenHistory = [];
+
+function showScreen(name) {
+  const current = document.querySelector('#app .screen.active')?.id?.replace('s-', '');
+  if (current && current !== name) screenHistory.push(current);
+
+  document.querySelectorAll('#app .screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bi').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + name).classList.add('active');
+  const bn = document.getElementById('bi-' + name);
+  if (bn) bn.classList.add('active');
+
+  // Show back button only when not on home
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) backBtn.style.display = (name !== 'home' && screenHistory.length > 0) ? 'block' : 'none';
+
+  if (name === 'chat') {
+    const cm = document.getElementById('chat-msgs');
+    setTimeout(() => { cm.scrollTop = cm.scrollHeight; }, 100);
+  }
+  if (name === 'admin') loadAdmin();
+}
+
+function goBack() {
+  if (screenHistory.length > 0) {
+    const prev = screenHistory.pop();
+    // Temporarily remove last to avoid re-pushing
+    const curr = document.querySelector('#app .screen.active')?.id?.replace('s-', '');
+    document.querySelectorAll('#app .screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.bi').forEach(b => b.classList.remove('active'));
+    document.getElementById('s-' + prev).classList.add('active');
+    const bn = document.getElementById('bi-' + prev);
+    if (bn) bn.classList.add('active');
+    const backBtn = document.getElementById('back-btn');
+    if (backBtn) backBtn.style.display = (prev !== 'home' && screenHistory.length > 0) ? 'block' : 'none';
+  }
+}
+
+// ─── LANGUAGE ───
+function toggleLang() {
+  lang = lang === 'ka' ? 'en' : 'ka';
+  document.getElementById('lang-btn').textContent = lang === 'ka' ? 'ENG' : 'ქარ';
+  applyLang();
+  if (currentUser && !currentUser.guest) loadClients();
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-ka]').forEach(el => {
+    el.textContent = lang === 'ka' ? el.dataset.ka : el.dataset.en;
+  });
+  document.getElementById('chat-welcome').innerHTML = lang === 'ka'
+    ? 'გამარჯობა! მე ONYX STUDIO-ს AI ასისტენტი ვარ. 👋<br><br>შეგიძლია მკითხო ფასებზე, საიტის შეკვეთაზე, ან ნებისმიერ სხვა თემაზე.'
+    : 'Hello! I\'m ONYX STUDIO\'s AI assistant. 👋<br><br>Ask me about pricing, ordering a website, or anything else.';
+}
+
+// ─── AI CHAT ───
+function quickQ(q) {
+  document.getElementById('chat-inp').value = q;
+  sendChat();
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  const msgs = document.getElementById('chat-msgs');
+  const userName = currentUser?.name?.slice(0,2).toUpperCase() || 'მე';
+
+  msgs.innerHTML += `
+    <div class="msg-row me">
+      <div class="av av-user">${userName}</div>
+      <div class="bubble user">${escHtml(text)}</div>
+    </div>`;
+
+  const typing = document.createElement('div');
+  typing.className = 'msg-row'; typing.id = 'typing';
+  typing.innerHTML = `<div class="av av-ai">AI</div><div class="bubble bot typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    if (currentUser?.guest || !token) {
+      // Fallback for guests
+      setTimeout(() => {
+        document.getElementById('typing')?.remove();
+        const reply = lang === 'ka'
+          ? 'სრული AI ასისტენტისთვის გთხოვთ დარეგისტრირდეთ! 🔐'
+          : 'Please register for full AI assistant access! 🔐';
+        msgs.innerHTML += `<div class="msg-row"><div class="av av-ai">AI</div><div class="bubble bot">${reply}</div></div>`;
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 800);
+      return;
+    }
+
+    const data = await api('/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message: text, lang })
+    });
+    document.getElementById('typing')?.remove();
+    msgs.innerHTML += `
+      <div class="msg-row">
+        <div class="av av-ai">AI</div>
+        <div class="bubble bot">${escHtml(data.reply).replace(/\n/g,'<br>')}</div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('typing')?.remove();
+    msgs.innerHTML += `<div class="msg-row"><div class="av av-ai">AI</div><div class="bubble bot" style="color:#EF4444;">შეცდომა: ${escHtml(e.message)}</div></div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── PLAN ORDER ───
+function orderPlan(plan, price) {
+  const msg = lang === 'ka'
+    ? `გამარჯობა! მინდა ${plan} პაკეტი — ${price}₾/თვე. გთხოვთ დამიკავშირდეთ!`
+    : `Hello! I'd like the ${plan} plan — ₾${price}/mo. Please contact me!`;
+  window.open(`https://wa.me/995597840303?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
